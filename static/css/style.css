@@ -1,0 +1,27 @@
+h1 {
+    color: #ffffff;
+    padding: 20px;
+    font-family: "Felix Titling";
+}
+table {
+font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+font-size: 16px;
+border-collapse: collapse;
+text-align: center;
+width: 1297px;
+background: rgba(255, 255, 255, 0.8);
+}
+td {
+color: #6f4e37;
+padding: 20px;
+font-family: "Felix Titling";
+border-width: 1px;
+padding: 10px 20px;
+height: 50px;
+}
+body {
+    -moz-background-size: 100%; /* Firefox 3.6+ */
+    -webkit-background-size: 100%; /* Safari 3.1+ и Chrome 4.0+ */
+    -o-background-size: 100%; /* Opera 9.6+ */
+    background-size: cover; /* Современные браузеры */
+}
