@@ -1,11 +1,14 @@
 import os
 
+import tg_bot
 from flask import Flask, render_template
-from flask_login import LoginManager, login_user, login_required, logout_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from werkzeug.utils import redirect
+import datetime
 
 from data import db_session
 from data.meals import Meals
+from data.orders import Orders
 from data.users import Users
 from forms.login import LoginForm
 from forms.register import RegisterForm
@@ -27,14 +30,29 @@ def load_user(user_id):
     return db_sess.query(Users).get(user_id)
 
 
-@app.route('/')
+@app.route('/about_us')
 def main_page():
     return render_template('index.html')
 
 
-@app.route('/menu')
+@app.route('/')
 def menu():
     return render_template('menu.html')
+
+
+@app.route('/orders_history')
+def orders_history():
+    ors = []
+    db_sess = db_session.create_session()
+    for order in db_sess.query(Orders).filter(Orders.client_id == current_user.id):
+        months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября',
+                  'ноября', 'декабря']
+        date_ = []
+        date_.append(str(order.date.day))
+        date_.append(months[order.date.month - 1])
+        date_.append(str(order.date.year))
+        ors.append([order.id, [i for i in order.meals.split(', ')], order.details, ' '.join(date_), order.is_ready])
+    return render_template('orders_history.html', orders=ors)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -84,6 +102,22 @@ def logout():
     return redirect("/")
 
 
+@app.route('/reorder/<int:id>', methods=['GET', 'POST'])
+def reorder(id):
+    db_sess = db_session.create_session()
+    ord = db_sess.query(Orders).filter(Orders.id == id).first()
+    order = Orders()
+    order.client_id = ord.client_id
+    order.meals = ord.meals
+    order.details = ord.details
+    ord.date = datetime.datetime.now
+    order.is_ready = False
+    db_sess = db_session.create_session()
+    db_sess.add(order)
+    db_sess.commit()
+    return redirect('/')
+
+
 # @app.route('/add', methods=['GET', 'POST'])
 # def add_meal():
 #     form = RegisterForm()
@@ -103,6 +137,7 @@ def logout():
 
 
 if __name__ == '__main__':
+    main()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    main()
+    # main()

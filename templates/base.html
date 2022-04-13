@@ -14,12 +14,20 @@
     <header>
         <h1 align="center">Bloom</h1>
         <ul class="nav justify-content-center">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">О нас</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/menu" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Сделать заказ</a>
-          </li>
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/about_us" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">О нас</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Сделать заказ</a>
+        </li>
+          {% if current_user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link" href="/orders_history" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">История заказов</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/basket" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Корзина</a>
+              </li>
+          {% endif %}
           {% if current_user.is_authenticated %}
               <li class="nav-item">
                 <a class="nav-link" href="/logout" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">{{ current_user.name }}</a>
