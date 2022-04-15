@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+                    href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css"
+                    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1"
+                    crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/css/style.css" type="text/css"/>
+    <title>{{title}}</title>
+</head>
+<body background="static/img/bg.jpg">
+<h1>Register Form</h1>
+<form action="" method="post" style="color: #e3f2fd; font-size: 20px; font-family: Felix Titling;">
+    {{ form.hidden_tag() }}
+    <p style="color: #e3f2fd; font-size: 20px; font-family: Felix Titling;">
+        {{ form.name.label }}<br>
+        {{ form.name(class="form-control") }}<br>
+        {% for error in form.name.errors %}
+    <p class="alert alert-danger" role="alert">
+        {{ error }}
+    </p>
+    {% endfor %}
+    </p>
+    <p style="color: #e3f2fd; font-size: 20px; font-family: Felix Titling;">
+        {{ form.number.label }}<br>
+        {{ form.number(class="form-control") }}<br>
+        {% for error in form.number.errors %}
+    <p class="alert alert-danger" role="alert">
+        {{ error }}
+    </p>
+    {% endfor %}
+    </p>
+    <p style="color: #e3f2fd; font-size: 20px; font-family: Felix Titling;">
+        {{ form.password.label }}<br>
+        {{ form.password(class="form-control", type="password") }}<br>
+        {% for error in form.password.errors %}
+    <p class="alert alert-danger" role="alert">
+        {{ error }}
+    </p>
+    {% endfor %}
+    </p>
+    <p style="color: #e3f2fd; font-size: 20px; font-family: Felix Titling;">
+        {{ form.password_again.label }}<br>
+        {{ form.password_again(class="form-control", type="password") }}<br>
+        {% for error in form.password_again.errors %}
+    <p class="alert alert-danger" role="alert">
+        {{ error }}
+    </p>
+    {% endfor %}
+    </p>
+    <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+    {{message}}
+</form>
+<br>
+</body>
+</html>
