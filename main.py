@@ -1,4 +1,4 @@
-import os
+import os, math
 
 import tg_bot
 from flask import Flask, render_template
@@ -8,6 +8,7 @@ import datetime
 
 from data import db_session
 from data.meals import Meals
+from data.admins import Admins
 from data.orders import Orders
 from data.users import Users
 from forms.login import LoginForm
@@ -17,6 +18,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+ORDER = []
 
 
 def main():
@@ -37,7 +40,61 @@ def main_page():
 
 @app.route('/')
 def menu():
-    return render_template('menu.html')
+    db_sess = db_session.create_session()
+    drinks = []
+    desserts = []
+    d1 = 0
+    d2 = 0
+    for m in db_sess.query(Meals).filter(Meals.category == 'Напитки'):
+        drinks.append([m.name, m.price, m.pic, m.in_stock])
+    for m in db_sess.query(Meals).filter(Meals.category == 'Дессерты'):
+        desserts.append([m.name, m.price, m.pic, m.in_stock])
+    cols = 3
+    n = math.ceil(len(drinks) / cols)
+    dr = []
+    for i in range(n):
+        dr.append([])
+    k = 0
+    for i in range(len(drinks)):
+        dr[k].append(drinks[i])
+        if (i + 1) % cols == 0:
+            k += 1
+    n = math.ceil(len(desserts) / cols)
+    ds = []
+    for i in range(n):
+        ds.append([])
+    k = 0
+    for i in range(len(desserts)):
+        ds[k].append(desserts[i])
+        if (i + 1) % cols == 0:
+            k += 1
+    print(ds)
+    print(dr)
+    return render_template('menu.html', drinks=dr, desserts=ds, len_ds=len(ds), len_dr=len(dr))
+
+
+@app.route('/admins_adding_cafe', methods=['GET', 'POST'])
+def add_admins():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if form.password.data != form.password_again.data:
+            return render_template('admins_adding.html', title='Добавление админов',
+                                   form=form,
+                                   message="Пароли не совпадают")
+        db_sess = db_session.create_session()
+        if db_sess.query(Admins).filter(Admins.number == form.number.data).first():
+            return render_template('admins_adding.html', title='Добавление админов',
+                                   form=form,
+                                   message="Такой админ уже есть")
+        adm = Admins(
+            name=form.name.data,
+            number=form.number.data
+        )
+        adm.set_password(form.password.data)
+        db_sess.add(adm)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('admins_adding.html', title='Регистрация админов', form=form)
 
 
 @app.route('/orders_history')
@@ -116,6 +173,11 @@ def reorder(id):
     db_sess.add(order)
     db_sess.commit()
     return redirect('/')
+
+
+# @app.route('/choosing/<int:id>', methods=['GET', 'POST'])
+# def reorder(id):
+#     return redirect('/')
 
 
 # @app.route('/add', methods=['GET', 'POST'])

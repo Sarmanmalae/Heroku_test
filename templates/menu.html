@@ -3,71 +3,53 @@
 {% block content %}
 <h1>Меню</h1>
 <h2 style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Напитки</h2>
+{% for j in range(len_dr) %}
 <div class="container">
   <div class="row">
+    {% for i in drinks[j] %}
     <div class="col">
-      <div class="card" style="width: 18rem;">
-        <img src="static/img/kapp.jpg" class="card-img-top" alt="...">
+      <div class="card" style="width: 18rem; height: 18 rem;">
+        <img src="static/img/{{ i[2] }}" class="card-img-top" alt="...">
         <div class="card-body">
-          <h5 class="card-title">Каппучино</h5>
+          <h5 class="card-title">{{ i[0] }}</h5>
+          {% if i[3] == True %}
           <a href="#" class="btn btn-primary">Добавить</a>
+          {% else %}
+          <a href="#" class="btn btn-primary" aria-disabled="true">Добавить</a>
+          {% endif %}
         </div>
       </div>
     </div>
-    <div class="col">
-      <div class="card" style="width: 18rem;">
-        <img src="static/img/espresso.jpg" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Эспрессо</h5>
-          <a href="#" class="btn btn-primary">Добавить</a>
-        </div>
-      </div>
-    </div>
-    <div class="col">
-      <div class="card" style="width: 18rem;">
-        <img src="static/img/americano.jpg" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Американо</h5>
-          <a href="#" class="btn btn-primary">Добавить</a>
-        </div>
-      </div>
-    </div>
+  {% endfor %}
   </div>
 </div>
+<br>
+{% endfor %}
 
 <br>
 
 <h2 style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Дессерты</h2>
+{% for j in range(len_ds) %}
 <div class="container">
   <div class="row">
+    {% for i in desserts[j] %}
     <div class="col">
-      <div class="card" style="width: 18rem;">
-        <img src="static/img/croissant.jpg" class="card-img-top" alt="...">
+      <div class="card" style="width: 18rem; height: 18rem;">
+        <img src="static/img/{{ i[2] }}" class="card-img-top" alt="...">
         <div class="card-body">
-          <h5 class="card-title">Круассаны</h5>
+          <h5 class="card-title">{{ i[0] }}</h5>
+          {% if i[3] == True %}
           <a href="#" class="btn btn-primary">Добавить</a>
+          {% else %}
+          <a href="#" class="btn btn-primary" aria-disabled="true">Добавить</a>
+          {% endif %}
         </div>
       </div>
     </div>
-    <div class="col">
-      <div class="card" style="width: 18rem;">
-        <img src="static/img/чизкейк.jpg" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Чизкейк</h5>
-          <a href="#" class="btn btn-primary">Добавить</a>
-        </div>
-      </div>
-    </div>
-    <div class="col">
-      <div class="card" style="width: 18rem;">
-        <img src="static/img/keks.jpg" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Кекс</h5>
-          <a href="#" class="btn btn-primary">Добавить</a>
-        </div>
-      </div>
-    </div>
+  {% endfor %}
   </div>
 </div>
+<br>
+{% endfor %}
 
 {% endblock %}
