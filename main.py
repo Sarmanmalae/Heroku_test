@@ -46,9 +46,9 @@ def menu():
     d1 = 0
     d2 = 0
     for m in db_sess.query(Meals).filter(Meals.category == 'Напитки'):
-        drinks.append([m.name, m.price, m.pic, m.in_stock])
+        drinks.append([m.name, m.price, m.pic, m.in_stock, m.id])
     for m in db_sess.query(Meals).filter(Meals.category == 'Дессерты'):
-        desserts.append([m.name, m.price, m.pic, m.in_stock])
+        desserts.append([m.name, m.price, m.pic, m.in_stock, m.id])
     cols = 3
     n = math.ceil(len(drinks) / cols)
     dr = []
@@ -68,8 +68,6 @@ def menu():
         ds[k].append(desserts[i])
         if (i + 1) % cols == 0:
             k += 1
-    print(ds)
-    print(dr)
     return render_template('menu.html', drinks=dr, desserts=ds, len_ds=len(ds), len_dr=len(dr))
 
 
@@ -95,6 +93,21 @@ def add_admins():
         db_sess.commit()
         return redirect('/')
     return render_template('admins_adding.html', title='Регистрация админов', form=form)
+
+@app.route('/order/<int:id>')
+def basket(id):
+    db_sess = db_session.create_session()
+    b_ = None
+    for u in db_sess.query(Users).filter(Users.id == id):
+        b_ = [int(i) for i in u.basket.split(', ')]
+    b = [db_sess.query(Meals).filter(Meals.id == i).first().name for i in b_]
+    bask = {}
+    for i in b:
+        if i not in bask:
+            bask[i] = b.count(i)
+    print(bask)
+    return render_template('basket_meals.html', meals=bask)
+
 
 
 @app.route('/orders_history')
@@ -175,9 +188,17 @@ def reorder(id):
     return redirect('/')
 
 
-# @app.route('/choosing/<int:id>', methods=['GET', 'POST'])
-# def reorder(id):
-#     return redirect('/')
+@app.route('/choose/<int:id>/<int:user_id>', methods=['GET', 'POST'])
+def choose(id, user_id):
+    db_sess = db_session.create_session()
+    for order in db_sess.query(Users).filter(Users.id == user_id):
+        b = order.basket
+        if not b:
+            order.basket = str(id)
+        else:
+            order.basket = b + ', ' + str(id)
+        db_sess.commit()
+    return redirect('/')
 
 
 # @app.route('/add', methods=['GET', 'POST'])
