@@ -94,20 +94,27 @@ def add_admins():
         return redirect('/')
     return render_template('admins_adding.html', title='Регистрация админов', form=form)
 
-@app.route('/order/<int:id>')
-def basket(id):
-    db_sess = db_session.create_session()
-    b_ = None
-    for u in db_sess.query(Users).filter(Users.id == id):
-        b_ = [int(i) for i in u.basket.split(', ')]
-    b = [db_sess.query(Meals).filter(Meals.id == i).first().name for i in b_]
-    bask = {}
-    for i in b:
-        if i not in bask:
-            bask[i] = b.count(i)
-    print(bask)
-    return render_template('basket_meals.html', meals=bask)
 
+@app.route('/basket')
+def basket():
+    db_sess = db_session.create_session()
+    a = current_user.id
+    b_ = None
+    if not db_sess.query(Users).filter(Users.id == a).first().basket:
+        return render_template('basket_empty.html')
+    else:
+        for u in db_sess.query(Users).filter(Users.id == a):
+            b_ = [int(i) for i in u.basket.split(', ')]
+        b = [db_sess.query(Meals).filter(Meals.id == i).first().name for i in b_]
+        bask = {}
+        for i in b:
+            if i not in bask:
+                bask[i] = [b.count(i), db_sess.query(Meals).filter(Meals.name == i).first().price]
+        all_price = 0
+        for i in bask:
+            for j in range(bask[i][0]):
+                all_price += bask[i][1]
+        return render_template('basket_meals.html', basket=bask, all_price=all_price)
 
 
 @app.route('/orders_history')
@@ -121,7 +128,18 @@ def orders_history():
         date_.append(str(order.date.day))
         date_.append(months[order.date.month - 1])
         date_.append(str(order.date.year))
-        ors.append([order.id, [i for i in order.meals.split(', ')], order.details, ' '.join(date_), order.is_ready])
+        meals_ = [int(i) for i in order.meals.split(', ')]
+        meals = []
+        for i in meals_:
+            meals.append(db_sess.query(Meals).filter(Meals.id == i).first().name)
+        bask = {}
+        for i in meals:
+            if i not in bask:
+                bask[i] = meals.count(i)
+        meal = []
+        for i in bask:
+            meal.append(i+"( "+str(bask[i])+"шт. )")
+        ors.append([order.id, meal, ' '.join(date_), order.is_ready, order.itog_price])
     return render_template('orders_history.html', orders=ors)
 
 
@@ -179,13 +197,47 @@ def reorder(id):
     order = Orders()
     order.client_id = ord.client_id
     order.meals = ord.meals
-    order.details = ord.details
+    order.itog_price = ord.itog_price
     ord.date = datetime.datetime.now
     order.is_ready = False
     db_sess = db_session.create_session()
     db_sess.add(order)
     db_sess.commit()
     return redirect('/')
+
+
+@app.route('/del/<name>', methods=['GET', 'POST'])
+def delete(name):
+    db_sess = db_session.create_session()
+    meal = db_sess.query(Meals).filter(Meals.name == name).first()
+    user = db_sess.query(Users).filter(Users.id == current_user.id).first()
+    bask = [int(i) for i in user.basket.split(', ')]
+    i = bask.index(meal.id)
+    del bask[i]
+    if bask:
+        user.basket = ', '.join(str(i) for i in bask)
+    else:
+        user.basket = None
+    db_sess.commit()
+    return redirect('/basket')
+
+
+@app.route('/order')
+def to_order():
+    db_sess = db_session.create_session()
+    user = db_sess.query(Users).filter(Users.id == current_user.id).first()
+    order = Orders()
+    order.client_id = current_user.id
+    order.meals = user.basket
+    price = []
+    for i in [int(i) for i in user.basket.split(', ')]:
+        price.append(db_sess.query(Meals).filter(Meals.id == i).first().price)
+    order.itog_price = sum(price)
+    order.is_ready = False
+    db_sess.add(order)
+    user.basket = None
+    db_sess.commit()
+    return redirect('/basket')
 
 
 @app.route('/choose/<int:id>/<int:user_id>', methods=['GET', 'POST'])

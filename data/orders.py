@@ -12,7 +12,7 @@ class Orders(SqlAlchemyBase):
                            primary_key=True, autoincrement=True)
     client_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id"))
     meals = sqlalchemy.Column(sqlalchemy.String)
-    details = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+    itog_price = sqlalchemy.Column(sqlalchemy.Integer)
     date = sqlalchemy.Column(sqlalchemy.DateTime,
                              default=datetime.datetime.now)
     is_ready = sqlalchemy.Column(sqlalchemy.Boolean)

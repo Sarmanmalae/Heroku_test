@@ -9,14 +9,17 @@
     {% for i in drinks[j] %}
     <div class="col">
       <div class="card" style="width: 18rem; height: 18 rem;">
-        <img src="static/img/{{ i[2] }}" class="card-img-top" alt="...">
         <div class="card-body">
+          <img src="static/img/{{ i[2] }}" class="card-img-top" alt="..." style="width: 15.8rem; height: 10rem;">
+          <br>
+          <br>
           <h5 class="card-title">{{ i[0] }}</h5>
           {% if i[3] and current_user.is_authenticated %}
           <a href="/choose/{{ i[-1] }}/{{ current_user.id }}" class="btn btn-primary">Добавить</a>
           {% else %}
           <a href="#" class="btn btn-primary disabled">Добавить</a>
           {% endif %}
+          <a style="color: #000000">{{ i[1] }}руб.</a>
         </div>
       </div>
     </div>
@@ -35,14 +38,17 @@
     {% for i in desserts[j] %}
     <div class="col">
       <div class="card" style="width: 18rem; height: 18rem;">
-        <img src="static/img/{{ i[2] }}" class="card-img-top" alt="...">
         <div class="card-body">
+          <img src="static/img/{{ i[2] }}" class="card-img-top" alt="..." style="width: 15.8rem; height: 10rem;">
+          <br>
+          <br>
           <h5 class="card-title">{{ i[0] }}</h5>
           {% if i[3] and current_user.is_authenticated %}
           <a href="/choose/{{ i[-1] }}/{{ current_user.id }}" class="btn btn-primary">Добавить</a>
           {% else %}
           <a href="#" class="btn btn-primary disabled">Добавить</a>
           {% endif %}
+          <a style="color: #000000">{{ i[1] }}руб.</a>
         </div>
       </div>
     </div>

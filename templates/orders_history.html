@@ -6,23 +6,27 @@
 <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
     <div class="col p-4 d-flex flex-column position-static">
       <h3 class="mb-0">Заказ №{{i[0]}}</h3>
-      <div class="mb-1 text-muted" style="color: #e3f2fd; font-family: Felix Titling">{{i[3]}}</div>
+      <div class="mb-1 text-muted" style="color: #e3f2fd; font-family: Felix Titling">{{i[2]}}</div>
       <p class="card-text mb-auto">Содержание заказа: {{', '.join(i[1])}}</p>
-      {% if i[2] != '' %}
-        <p class="card-text mb-auto">Детали: {{i[2]}}</p>
-      {% else %}
-        <p class="card-text mb-auto">Дополнительных пожеланий не было</p>
-      {% endif %}
-      {% if i[4] %}
+      {% if i[3] %}
         <p>Ваш заказ готов</p>
       {% else %}
         <p>Ваш заказ не готов</p>
       {% endif %}
-      <div>
-        <a href="/reorder/{{ i[0] }}" class="btn btn-warning">
-            Повторить
-        </a>
-    </div>
+      <div class="container">
+      <div class="row" style="width: 275px;">
+        <div class="col">
+            <div>
+            <a href="/reorder/{{ i[0] }}" class="btn btn-warning">
+                Повторить
+            </a>
+            </div>
+        </div>
+        <div class="col">
+          <p class="card-text mb-auto" style="font-size: 24px;">Сумма: {{ i[-1] }}</p>
+        </div>
+      </div>
+      </div>
     </div>
 </div>
 {% endfor %}
