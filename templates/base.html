@@ -17,7 +17,7 @@
         <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="/about_us" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">О нас</a>
         </li>
-          {% if current_user.is_authenticated and current_user.number != '+79274961007' %}
+          {% if current_user.is_authenticated and current_user.admin == 0 %}
             <li class="nav-item">
             <a class="nav-link" href="/" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Сделать заказ</a>
             </li>
@@ -30,9 +30,9 @@
               <li class="nav-item">
                 <a class="nav-link" href="/logout" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">{{ current_user.name }}</a>
               </li>
-          {% elif current_user.is_authenticated and current_user.number == '+79274961007' %}
+          {% elif current_user.is_authenticated and current_user.admin == 1 %}
               <li class="nav-item">
-                <a class="nav-link" href="/logout" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Изменить меню</a>
+                <a class="nav-link" href="/change_menu" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Изменить меню</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/logout" style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">{{ current_user.name }}(admin)</a>

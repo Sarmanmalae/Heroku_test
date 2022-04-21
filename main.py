@@ -8,7 +8,6 @@ import datetime
 
 from data import db_session
 from data.meals import Meals
-from data.admins import Admins
 from data.orders import Orders
 from data.users import Users
 from forms.login import LoginForm
@@ -80,16 +79,18 @@ def add_admins():
                                    form=form,
                                    message="Пароли не совпадают")
         db_sess = db_session.create_session()
-        if db_sess.query(Admins).filter(Admins.number == form.number.data).first():
+        if db_sess.query(Users).filter(Users.number == form.number.data).first() or db_sess.query(Users).filter(
+                Users.number == form.number.data).first():
             return render_template('admins_adding.html', title='Добавление админов',
                                    form=form,
                                    message="Такой админ уже есть")
-        adm = Admins(
+        user = Users(
             name=form.name.data,
             number=form.number.data
         )
-        adm.set_password(form.password.data)
-        db_sess.add(adm)
+        user.set_password(form.password.data)
+        user.admin = True
+        db_sess.add(user)
         db_sess.commit()
         return redirect('/')
     return render_template('admins_adding.html', title='Регистрация админов', form=form)
@@ -138,7 +139,7 @@ def orders_history():
                 bask[i] = meals.count(i)
         meal = []
         for i in bask:
-            meal.append(i+"( "+str(bask[i])+"шт. )")
+            meal.append(i + "( " + str(bask[i]) + "шт. )")
         ors.append([order.id, meal, ' '.join(date_), order.is_ready, order.itog_price])
     return render_template('orders_history.html', orders=ors)
 
@@ -147,18 +148,21 @@ def orders_history():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        if form.password.data != form.password_again.data:
+        if len(str(form.number.data)) != 11 or not str(form.number.data).isdigit():
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Неверный формат номера")
+        elif form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
         db_sess = db_session.create_session()
-        if db_sess.query(Users).filter(Users.email == form.email.data).first():
+        if db_sess.query(Users).filter(Users.number == form.number.data).first():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
         user = Users(
             name=form.name.data,
-            email=form.email.data,
             number=form.number.data
         )
         user.set_password(form.password.data)
@@ -173,7 +177,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        user = db_sess.query(Users).filter(Users.email == form.email.data).first()
+        user = db_sess.query(Users).filter(Users.number == form.number.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
@@ -253,22 +257,72 @@ def choose(id, user_id):
     return redirect('/')
 
 
-# @app.route('/add', methods=['GET', 'POST'])
-# def add_meal():
-#     form = RegisterForm()
-#     if form.validate_on_submit():
-#         db_sess = db_session.create_session()
-#         job = Jobs(
-#             job=form.job.data,
-#             team_leader=form.surname.data,
-#             work_hours=form.work_hours.data,
-#             collaborators=form.collaborators.data,
-#             is_finished=form.is_finished.data
-#         )
-#         db_sess.add(job)
-#         db_sess.commit()
-#         return redirect('/')
-#     return render_template('meal_adding.html', title='Добавление в меню', form=form)
+@app.route('/change_menu')
+def change_menu():
+    db_sess = db_session.create_session()
+    drinks = []
+    desserts = []
+    d1 = 0
+    d2 = 0
+    for m in db_sess.query(Meals).filter(Meals.category == 'Напитки'):
+        drinks.append([m.name, m.price, m.pic, m.in_stock, m.id])
+    for m in db_sess.query(Meals).filter(Meals.category == 'Дессерты'):
+        desserts.append([m.name, m.price, m.pic, m.in_stock, m.id])
+    cols = 3
+    n = math.ceil(len(drinks) / cols)
+    dr = []
+    for i in range(n):
+        dr.append([])
+    k = 0
+    for i in range(len(drinks)):
+        dr[k].append(drinks[i])
+        if (i + 1) % cols == 0:
+            k += 1
+    n = math.ceil(len(desserts) / cols)
+    ds = []
+    for i in range(n):
+        ds.append([])
+    k = 0
+    for i in range(len(desserts)):
+        ds[k].append(desserts[i])
+        if (i + 1) % cols == 0:
+            k += 1
+    return render_template('change_menu.html', drinks=dr, desserts=ds, len_ds=len(ds), len_dr=len(dr))
+
+
+@app.route('/delete_meal/<int:num>', methods=['GET', 'POST'])
+def delete_meal(num):
+    db_sess = db_session.create_session()
+    db_sess.query(Meals).filter(Meals.id == num).delete()
+    db_sess.commit()
+    return redirect('/change_menu')
+
+@app.route('/add_meal', methods=['GET', 'POST'])
+def add_meal():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if len(str(form.number.data)) != 11 or not str(form.number.data).isdigit():
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Неверный формат номера")
+        elif form.password.data != form.password_again.data:
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Пароли не совпадают")
+        db_sess = db_session.create_session()
+        if db_sess.query(Users).filter(Users.number == form.number.data).first():
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Такой пользователь уже есть")
+        user = Users(
+            name=form.name.data,
+            number=form.number.data
+        )
+        user.set_password(form.password.data)
+        db_sess.add(user)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('register.html', title='Регистрация', form=form)
 
 
 if __name__ == '__main__':

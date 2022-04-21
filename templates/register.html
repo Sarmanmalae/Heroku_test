@@ -14,15 +14,6 @@
     {% endfor %}
     </p>
     <p style="color: #e3f2fd; font-size: 20px; font-family: Felix Titling;">
-        {{ form.email.label }}<br>
-        {{ form.email(class="form-control", type="email") }}<br>
-        {% for error in form.email.errors %}
-    <p class="alert alert-danger" role="alert">
-        {{ error }}
-    </p>
-    {% endfor %}
-    </p>
-    <p style="color: #e3f2fd; font-size: 20px; font-family: Felix Titling;">
         {{ form.number.label }}<br>
         {{ form.number(class="form-control") }}<br>
         {% for error in form.number.errors %}
@@ -50,6 +41,6 @@
     {% endfor %}
     </p>
     <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
-    {{message}}
+    <p>{{message}}</p>
 </form>
 {% endblock %}
