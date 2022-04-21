@@ -12,6 +12,7 @@ from data.orders import Orders
 from data.users import Users
 from forms.login import LoginForm
 from forms.register import RegisterForm
+from forms.meal_adding import MealAddingForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -297,32 +298,26 @@ def delete_meal(num):
     db_sess.commit()
     return redirect('/change_menu')
 
+
 @app.route('/add_meal', methods=['GET', 'POST'])
 def add_meal():
-    form = RegisterForm()
+    form = MealAddingForm()
     if form.validate_on_submit():
-        if len(str(form.number.data)) != 11 or not str(form.number.data).isdigit():
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Неверный формат номера")
-        elif form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Пароли не совпадают")
         db_sess = db_session.create_session()
-        if db_sess.query(Users).filter(Users.number == form.number.data).first():
-            return render_template('register.html', title='Регистрация',
-                                   form=form,
-                                   message="Такой пользователь уже есть")
-        user = Users(
-            name=form.name.data,
-            number=form.number.data
-        )
-        user.set_password(form.password.data)
-        db_sess.add(user)
+        if db_sess.query(Meals).filter(Meals.name == form.name.data).first():
+            return render_template('meal_adding.html', title='Регистрация', form=form,
+                                   message="Такой пункт уже есть в меню")
+        meal = Meals()
+        meal.name = form.name.data
+        meal.price = form.price.data
+        meal.category = form.price.data
+        meal.in_stock = form.in_stock.data
+        print(form.pic.data)
+        print(type(form.pic.data))
+        db_sess.add(meal)
         db_sess.commit()
         return redirect('/')
-    return render_template('register.html', title='Регистрация', form=form)
+    return render_template('meal_adding.html', title='Регистрация', form=form)
 
 
 if __name__ == '__main__':

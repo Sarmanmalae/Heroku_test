@@ -11,5 +11,5 @@ class Meals(SqlAlchemyBase):
     name = sqlalchemy.Column(sqlalchemy.String)
     category = sqlalchemy.Column(sqlalchemy.String)
     price = sqlalchemy.Column(sqlalchemy.Integer)
-    pic = sqlalchemy.Column(sqlalchemy.String)
+    pic = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     in_stock = sqlalchemy.Column(sqlalchemy.Boolean)

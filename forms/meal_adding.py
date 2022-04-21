@@ -4,7 +4,7 @@ from wtforms.validators import DataRequired
 from wtforms import FileField
 
 
-class RegisterForm(FlaskForm):
+class MealAddingForm(FlaskForm):
     name = StringField('Название', validators=[DataRequired()])
     price = IntegerField('Цена', validators=[DataRequired()])
     pic = FileField('Картинка', validators=[DataRequired()])
