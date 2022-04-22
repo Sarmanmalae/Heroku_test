@@ -51,9 +51,7 @@ def menu():
         desserts.append([m.name, m.price, m.pic, m.in_stock, m.id])
     cols = 3
     n = math.ceil(len(drinks) / cols)
-    dr = []
-    for i in range(n):
-        dr.append([])
+    dr = [[] for i in range(n)]
     k = 0
     for i in range(len(drinks)):
         dr[k].append(drinks[i])
@@ -310,10 +308,9 @@ def add_meal():
         meal = Meals()
         meal.name = form.name.data
         meal.price = form.price.data
-        meal.category = form.price.data
+        meal.category = form.category.data
         meal.in_stock = form.in_stock.data
-        print(form.pic.data)
-        print(type(form.pic.data))
+        meal.pic = form.pic.data
         db_sess.add(meal)
         db_sess.commit()
         return redirect('/')

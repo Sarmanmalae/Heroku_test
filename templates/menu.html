@@ -4,31 +4,29 @@
 <h1>Меню</h1>
 <h2 style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Напитки</h2>
 {% for j in range(len_dr) %}
-<div class="container">
-  <div class="row">
+<div class="row row-cols-1 row-cols-md-3 g-4">
     {% for i in drinks[j] %}
     <div class="col">
-      <div class="card" style="width: 18rem; height: 18 rem;">
-        <div class="card-body">
-          {% if i[2] %}
-          <img src="static/img/{{ i[2] }}" class="card-img-top" alt="..." style="width: 15.8rem; height: 10rem;">
-          <br>
-          {% endif %}
-          <br>
-          <h5 class="card-title">{{ i[0] }}</h5>
-          {% if i[3] and current_user.is_authenticated and current_user.admin == False %}
-          <a href="/choose/{{ i[-1] }}/{{ current_user.id }}" class="btn btn-primary">Добавить</a>
-          {% elif not i[3] %}
-          <a href="#" class="btn btn-primary disabled">Нет в наличии...</a>
-          {% elif not current_user.is_authenticated or current_user.admin == True %}
-          <a href="#" class="btn btn-primary disabled">Добавить</a>
-          {% endif %}
-          <a style="color: #000000">{{ i[1] }}руб.</a>
+        <div class="card" style="width: 18rem; height: 18 rem;">
+            <div class="card-body">
+                {% if i[2] %}
+                <img src="static/img/{{ i[2] }}" class="card-img-top" alt="..." style="width: 15.8rem; height: 10rem;">
+                <br>
+                {% endif %}
+                <br>
+                <h5 class="card-title">{{ i[0] }}</h5>
+                {% if i[3] and current_user.is_authenticated and current_user.admin == False %}
+                <a href="/choose/{{ i[-1] }}/{{ current_user.id }}" class="btn btn-primary">Добавить</a>
+                {% elif not i[3] %}
+                <a href="#" class="btn btn-primary disabled">Нет в наличии...</a>
+                {% elif not current_user.is_authenticated or current_user.admin == True %}
+                <a href="#" class="btn btn-primary disabled">Добавить</a>
+                {% endif %}
+                <a style="color: #000000">{{ i[1] }}руб.</a>
+            </div>
         </div>
-      </div>
     </div>
-  {% endfor %}
-  </div>
+    {% endfor %}
 </div>
 <br>
 {% endfor %}
@@ -37,31 +35,29 @@
 
 <h2 style="color: #e3f2fd; font-size: 24px; font-family: Felix Titling">Дессерты</h2>
 {% for j in range(len_ds) %}
-<div class="container">
-  <div class="row">
+<div class="row row-cols-1 row-cols-md-3 g-4">
     {% for i in desserts[j] %}
     <div class="col">
-      <div class="card" style="width: 18rem; height: 18rem;">
-        <div class="card-body">
-          {% if i[2] %}
-          <img src="static/img/{{ i[2] }}" class="card-img-top" alt="..." style="width: 15.8rem; height: 10rem;">
-          <br>
-          {% endif %}
-          <br>
-          <h5 class="card-title">{{ i[0] }}</h5>
-          {% if i[3] and current_user.is_authenticated and current_user.admin == False %}
-          <a href="/choose/{{ i[-1] }}/{{ current_user.id }}" class="btn btn-primary">Добавить</a>
-          {% elif not i[3] %}
-          <a href="#" class="btn btn-primary disabled">Нет в наличии...</a>
-          {% elif not current_user.is_authenticated or current_user.admin == True %}
-          <a href="#" class="btn btn-primary disabled">Добавить</a>
-          {% endif %}
-          <a style="color: #000000">{{ i[1] }}руб.</a>
+        <div class="card" style="width: 18rem; height: 18 rem;">
+            <div class="card-body">
+                {% if i[2] %}
+                <img src="static/img/{{ i[2] }}" class="card-img-top" alt="..." style="width: 15.8rem; height: 10rem;">
+                <br>
+                {% endif %}
+                <br>
+                <h5 class="card-title">{{ i[0] }}</h5>
+                {% if i[3] and current_user.is_authenticated and current_user.admin == False %}
+                <a href="/choose/{{ i[-1] }}/{{ current_user.id }}" class="btn btn-primary">Добавить</a>
+                {% elif not i[3] %}
+                <a href="#" class="btn btn-primary disabled">Нет в наличии...</a>
+                {% elif not current_user.is_authenticated or current_user.admin == True %}
+                <a href="#" class="btn btn-primary disabled">Добавить</a>
+                {% endif %}
+                <a style="color: #000000">{{ i[1] }}руб.</a>
+            </div>
         </div>
-      </div>
     </div>
-  {% endfor %}
-  </div>
+    {% endfor %}
 </div>
 <br>
 {% endfor %}
