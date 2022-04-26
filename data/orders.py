@@ -16,5 +16,4 @@ class Orders(SqlAlchemyBase):
     date = sqlalchemy.Column(sqlalchemy.DateTime,
                              default=datetime.datetime.now)
     is_ready = sqlalchemy.Column(sqlalchemy.Boolean)
-
     news = orm.relation("Users")

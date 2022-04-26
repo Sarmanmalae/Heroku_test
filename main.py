@@ -1,9 +1,9 @@
 import os, math
 
-import tg_bot
 from flask import Flask, render_template
-from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from flask_login import LoginManager, login_user, login_required, logout_user, current_user, user_unauthorized
 from werkzeug.utils import redirect
+from flask_restful import reqparse, abort, Api, Resource
 import datetime
 
 from data import db_session
@@ -15,11 +15,37 @@ from forms.register import RegisterForm
 from forms.meal_adding import MealAddingForm
 
 app = Flask(__name__)
+api = Api(app)
+order_details = {}
+
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 login_manager = LoginManager()
 login_manager.init_app(app)
 
 ORDER = []
+
+
+class ChangeIsReady(Resource):
+    def get(self, num):
+        print(1)
+        db_sess = db_session.create_session()
+        m = db_sess.query(Meals).filter(Meals.id == num['data'])
+        print(m.is_ready)
+        m.is_ready = True
+        db_sess.commit()
+        return {'hello': 'world'}
+
+    def put(self, num):
+        print(1)
+        db_sess = db_session.create_session()
+        m = db_sess.query(Meals).filter(Meals.id == num['data'])
+        print(m.is_ready)
+        m.is_ready = True
+        db_sess.commit()
+        return {}
+
+
+api.add_resource(ChangeIsReady, '/bloom_api/<int:order_id>')
 
 
 def main():
@@ -41,32 +67,30 @@ def main_page():
 @app.route('/')
 def menu():
     db_sess = db_session.create_session()
-    drinks = []
-    desserts = []
-    d1 = 0
-    d2 = 0
-    for m in db_sess.query(Meals).filter(Meals.category == 'Напитки'):
-        drinks.append([m.name, m.price, m.pic, m.in_stock, m.id])
-    for m in db_sess.query(Meals).filter(Meals.category == 'Дессерты'):
-        desserts.append([m.name, m.price, m.pic, m.in_stock, m.id])
+    if user_unauthorized and current_user.basket:
+        basket_user = [int(i) for i in current_user.basket.split(', ')]
+    else:
+        basket_user = [0]
+    a = []
+    for i in db_sess.query(Meals).all():
+        a.append(i.category)
+    all_meals = {}
+    for i in sorted(list(set(a)), reverse=True):
+        a = []
+        for m in db_sess.query(Meals).filter(Meals.category == i):
+            a.append([m.name, m.price, m.pic, m.in_stock, basket_user.count(m.id), m.id])
+        all_meals[i] = a
     cols = 3
-    n = math.ceil(len(drinks) / cols)
-    dr = [[] for i in range(n)]
-    k = 0
-    for i in range(len(drinks)):
-        dr[k].append(drinks[i])
-        if (i + 1) % cols == 0:
-            k += 1
-    n = math.ceil(len(desserts) / cols)
-    ds = []
-    for i in range(n):
-        ds.append([])
-    k = 0
-    for i in range(len(desserts)):
-        ds[k].append(desserts[i])
-        if (i + 1) % cols == 0:
-            k += 1
-    return render_template('menu.html', drinks=dr, desserts=ds, len_ds=len(ds), len_dr=len(dr))
+    for i in all_meals:
+        n = math.ceil(len(all_meals[i]) / cols)
+        dr = [[] for i in range(n)]
+        k = 0
+        for j in range(len(all_meals[i])):
+            dr[k].append(all_meals[i][j])
+            if (j + 1) % cols == 0:
+                k += 1
+        all_meals[i] = [dr, len(dr)]
+    return render_template('menu.html', all_meals=all_meals)
 
 
 @app.route('/admins_adding_cafe', methods=['GET', 'POST'])
@@ -140,7 +164,7 @@ def orders_history():
         for i in bask:
             meal.append(i + "( " + str(bask[i]) + "шт. )")
         ors.append([order.id, meal, ' '.join(date_), order.is_ready, order.itog_price])
-    return render_template('orders_history.html', orders=ors)
+    return render_template('orders_history.html', orders=ors[::-1])
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -228,19 +252,23 @@ def delete(name):
 @app.route('/order')
 def to_order():
     db_sess = db_session.create_session()
-    user = db_sess.query(Users).filter(Users.id == current_user.id).first()
-    order = Orders()
-    order.client_id = current_user.id
-    order.meals = user.basket
-    price = []
-    for i in [int(i) for i in user.basket.split(', ')]:
-        price.append(db_sess.query(Meals).filter(Meals.id == i).first().price)
-    order.itog_price = sum(price)
-    order.is_ready = False
-    db_sess.add(order)
-    user.basket = None
-    db_sess.commit()
-    return redirect('/basket')
+    if db_sess.query(Users).filter(Users.id == current_user.id).first().basket:
+        user = db_sess.query(Users).filter(Users.id == current_user.id).first()
+        order = Orders()
+        order.client_id = current_user.id
+        order.meals = user.basket
+        price = []
+        for i in [int(i) for i in user.basket.split(', ')]:
+            price.append(db_sess.query(Meals).filter(Meals.id == i).first().price)
+        order.itog_price = sum(price)
+        order.is_ready = False
+        db_sess.add(order)
+        user.basket = None
+        order_details['id'] = order.id
+        order_details['client_name'] = user.name
+        db_sess.commit()
+        return redirect('/basket')
+    return redirect('/')
 
 
 @app.route('/choose/<int:id>/<int:user_id>', methods=['GET', 'POST'])
