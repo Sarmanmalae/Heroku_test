@@ -67,9 +67,9 @@ def main_page():
 @app.route('/')
 def menu():
     db_sess = db_session.create_session()
-    if user_unauthorized and current_user.basket:
+    try:
         basket_user = [int(i) for i in current_user.basket.split(', ')]
-    else:
+    except Exception:
         basket_user = [0]
     a = []
     for i in db_sess.query(Meals).all():
